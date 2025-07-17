@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const spotsLeft = details.max_participants - details.participants.length;
 
-        // Générer la liste des participants
+        // Générer la liste des participants avec icône de suppression
         let participantsHTML = "";
         if (details.participants.length > 0) {
           participantsHTML = `
@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 ${details.participants
                   .map(
                     (participant) =>
-                      `<li class="participant-item">${participant}</li>`
+                      `<li class="participant-item">${participant} <span class="delete-participant" title="Désinscrire" data-activity="${encodeURIComponent(name)}" data-email="${encodeURIComponent(participant)}">🗑️</span></li>`
                   )
                   .join("")}
               </ul>
@@ -61,6 +61,38 @@ document.addEventListener("DOMContentLoaded", () => {
         option.textContent = name;
         activitySelect.appendChild(option);
       });
+
+      // Ajouter les gestionnaires d'événements pour la suppression des participants
+      document.querySelectorAll('.delete-participant').forEach((icon) => {
+        icon.addEventListener('click', async (e) => {
+          const activity = decodeURIComponent(icon.getAttribute('data-activity'));
+          const email = decodeURIComponent(icon.getAttribute('data-email'));
+          if (confirm(`Désinscrire ${email} de l'activité "${activity}" ?`)) {
+            try {
+              const response = await fetch(`/activities/${encodeURIComponent(activity)}/signup?email=${encodeURIComponent(email)}`, {
+                method: 'DELETE',
+              });
+              const result = await response.json();
+              if (response.ok) {
+                messageDiv.textContent = result.message || 'Participant désinscrit.';
+                messageDiv.className = 'success';
+                fetchActivities();
+              } else {
+                messageDiv.textContent = result.detail || 'Erreur lors de la désinscription.';
+                messageDiv.className = 'error';
+              }
+              messageDiv.classList.remove('hidden');
+              setTimeout(() => {
+                messageDiv.classList.add('hidden');
+              }, 5000);
+            } catch (error) {
+              messageDiv.textContent = 'Erreur réseau lors de la désinscription.';
+              messageDiv.className = 'error';
+              messageDiv.classList.remove('hidden');
+            }
+          }
+        });
+      });
     } catch (error) {
       activitiesList.innerHTML = "<p>Failed to load activities. Please try again later.</p>";
       console.error("Error fetching activities:", error);
@@ -88,6 +120,7 @@ document.addEventListener("DOMContentLoaded", () => {
         messageDiv.textContent = result.message;
         messageDiv.className = "success";
         signupForm.reset();
+        fetchActivities(); // Mettre à jour la liste après inscription
       } else {
         messageDiv.textContent = result.detail || "An error occurred";
         messageDiv.className = "error";
