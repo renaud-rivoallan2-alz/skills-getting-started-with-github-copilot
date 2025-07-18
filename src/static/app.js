@@ -62,7 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
         activitySelect.appendChild(option);
       });
 
-      // Ajouter les gestionnaires d'événements pour la suppression des participants
+      // Add event handlers for participant deletion
       document.querySelectorAll('.delete-participant').forEach((icon) => {
         icon.addEventListener('click', async (e) => {
           const activity = decodeURIComponent(icon.getAttribute('data-activity'));
