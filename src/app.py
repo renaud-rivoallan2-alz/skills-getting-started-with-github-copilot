@@ -111,7 +111,7 @@ def signup_for_activity(activity_name: str, email: str):
     return {"message": f"Signed up {email} for {activity_name}"}
 
 
-# Endpoint pour désinscrire un participant d'une activité
+# Endpoint to unregister a participant from an activity
 @app.delete("/activities/{activity_name}/signup")
 def remove_participant(activity_name: str, email: str):
     """Unregister a student from an activity"""
