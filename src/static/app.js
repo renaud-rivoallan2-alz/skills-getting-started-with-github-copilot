@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const spotsLeft = details.max_participants - details.participants.length;
 
-        // Générer la liste des participants avec icône de suppression
+        // Generate the participants list with delete icon
         let participantsHTML = "";
         if (details.participants.length > 0) {
           participantsHTML = `
